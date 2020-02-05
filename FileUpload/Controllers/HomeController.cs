@@ -10,8 +10,7 @@ namespace FileUpload.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
-
+            ViewBag.Title = "Upload File";
             return View();
         }
     }
