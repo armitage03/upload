@@ -1,22 +1,80 @@
-﻿<header>
-    <div class="content-wrapper">
-        <div class="float-left">
-            <p class="site-title">
-                <a href="~/">File Upload</a>
-            </p>
-        </div>
-    </div>
-</header>
-<div id="body">
+﻿<div class="form-horizontal">
+    <h4><strong>File Upload</strong></h4>
     <form name="form1" method="post" action="api/file" enctype="multipart/form-data">
-        <div>
-            <label>
-                Browse File
-            </label>
-            <input name="myFile" type="file" />
+        <div class="form-group row">
+            <div class="col-md-12">
+                <input type="file" id="fileUpload" name="fileUpload" accept=".csv,.xml" onchange="UploadFiles(event,this)" />
+                <span class="text-danger field-validation-valid fileUploadValidation" data-valmsg-for="fileUpload" data-valmsg-replace="true"></span>
+            </div>
         </div>
-        <div>
-            <input type="submit" value="Upload" />
+
+        <div class="form-group row">
+            <div class="col-md-12">
+                <input type="submit" value="Save" class="btn btn-success col-xs-12 col-sm-3 col-md-2 col-lg-2" />
+            </div>
         </div>
     </form>
 </div>
+@section Scripts {
+    <script type="text/javascript">
+        function UploadFiles(event, input) {
+            removeValidationError($(input));
+            if ($(input).val() === "") {
+                addValidationError($(input), "This field is required.");
+                $(input)[0].value = '';
+                $(input).focus();
+                return false;
+            }
+            else if (input.files && input.files[0]) {
+                var ext = $('#fileUpload').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['csv', 'xml']) === -1) {
+                    addValidationError($('#fileUpload'), "Unknown format.");
+                    $(input)[0].value = '';
+                    $(input).focus();
+                }
+                else if (!isValidFileUploadSize(input, $(".fileUploadValidation"))) {
+                    $(input)[0].value = '';
+                    $(input).focus();
+                }
+            }
+        }
+        function requiredFieldValidation() {
+            var result = true;
+            clearAllValidationError();
+            if ($('#fileUpload').val() === "") {
+                addValidationError($('#fileUpload'), "This field is required.");               
+                $('#fileUpload').focus();
+                return false;
+            }
+            return result;
+        }
+        $(document).ready(function () {
+            $("input[type='submit']").click(function (event) {
+                event.preventDefault();
+                if (requiredFieldValidation()) {
+                    var fileData = new FormData();
+                    var input = document.getElementById("fileUpload");
+                    fileData.append(input.files[0].name, input.files[0]);
+                    $.ajax({
+                        url: '/api/file',
+                        type: "POST",
+                        contentType: false,
+                        processData: false, // Not to process data
+                        data: fileData,
+                        success: function (data) {
+                            console.log(data);
+                            alert("OK");
+                        },
+                        error: function (xhr, status, error) {
+                            alert("Error");
+                            console.log(xhr);
+                            console.log(status);
+                            console.log(error);
+                        }
+                    });
+                }               
+            });
+        });
+    </script>
+}
+

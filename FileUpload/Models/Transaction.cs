@@ -12,6 +12,8 @@ namespace FileUpload.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        public string Code { get; set; }
+        [Required]
         public decimal Amount { get; set; }
         [Required]
         public string CurrencyCode { get; set; }
@@ -22,8 +24,10 @@ namespace FileUpload.Models
         [Required]
         public Status Status { get; set; }
         [NotMapped]
-        public string OutputStatus {
-            get {
+        public string OutputStatus
+        {
+            get
+            {
                 string status = "";
                 if (Status == Status.Approved)
                     status = "A";
@@ -38,6 +42,7 @@ namespace FileUpload.Models
     }
     public enum Status
     {
+        None = 0,
         Approved = 1,
         Failed = 2,
         Finished = 3,
