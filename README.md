@@ -11,8 +11,7 @@ In order to run and test the project, you need to change database configuration.
 You need to open Web.config file under FileUpload folder. Change DBServerName and DatabaseName.
 
 ```
-<add name="DefaultConnection" connectionString="data source=DBServerName;initial catalog=DatabaseName;Integrated Security=True" providerName="System.Data.SqlClient" />
-    
+<add name="DefaultConnection" connectionString="data source=DBServerName;initial catalog=DatabaseName;Integrated Security=True" providerName="System.Data.SqlClient" />    
 ```
 
 ### Run table script into your database
