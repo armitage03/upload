@@ -7,6 +7,22 @@ using System.Web;
 
 namespace FileUpload.Models
 {
+    public class TransactionViewModel
+    {
+        public string Code { get; set; }
+        public string Amount { get; set; }
+        public string CurrencyCode { get; set; }
+        public string TransactionDate { get; set; }
+        public string Status { get; set; }
+        public bool IsCSV { get; set; }
+    }
+    public class TransactionListViewModel
+    {
+        public string id { get; set; }
+        public string payment { get; set; }
+        public string Status { get; set; }
+
+    }
     public class Transaction
     {
         [Key]
@@ -40,6 +56,7 @@ namespace FileUpload.Models
             private set { }
         }
     }
+    
     public enum Status
     {
         None = 0,

@@ -1,5 +1,5 @@
 ﻿<div class="form-horizontal">
-    <h4><strong>File Upload</strong></h4>
+    <h3>Upload Transactions</h3>
     <form name="form1" method="post" action="api/file" enctype="multipart/form-data">
         <div class="form-group row">
             <div class="col-md-12">
@@ -10,71 +10,75 @@
 
         <div class="form-group row">
             <div class="col-md-12">
-                <input type="submit" value="Save" class="btn btn-success col-xs-12 col-sm-3 col-md-2 col-lg-2" />
+                <input type="button" id="btnSave" value="Save" class="btn btn-success col-xs-12 col-sm-3 col-md-2 col-lg-2" />
             </div>
         </div>
     </form>
 </div>
-@section Scripts {
-    <script type="text/javascript">
-        function UploadFiles(event, input) {
-            removeValidationError($(input));
-            if ($(input).val() === "") {
-                addValidationError($(input), "This field is required.");
-                $(input)[0].value = '';
-                $(input).focus();
-                return false;
-            }
-            else if (input.files && input.files[0]) {
-                var ext = $('#fileUpload').val().split('.').pop().toLowerCase();
-                if ($.inArray(ext, ['csv', 'xml']) === -1) {
-                    addValidationError($('#fileUpload'), "Unknown format.");
+    @section Scripts {
+        <script type="text/javascript">            
+            function UploadFiles(event, input) {
+                removeValidationError($(input));
+                if ($(input).val() === "") {
+                    addValidationError($(input), "This field is required.");
                     $(input)[0].value = '';
                     $(input).focus();
+                    return false;
                 }
-                else if (!isValidFileUploadSize(input, $(".fileUploadValidation"))) {
-                    $(input)[0].value = '';
-                    $(input).focus();
+                else if (input.files && input.files[0]) {
+                    var ext = $('#fileUpload').val().split('.').pop().toLowerCase();
+                    if ($.inArray(ext, ['csv', 'xml']) === -1) {
+                        addValidationError($('#fileUpload'), "Unknown format.");
+                        $(input)[0].value = '';
+                        $(input).focus();
+                    }
+                    else if (!isValidFileUploadSize(input, $(".fileUploadValidation"))) {
+                        $(input)[0].value = '';
+                        $(input).focus();
+                    }
                 }
             }
-        }
-        function requiredFieldValidation() {
-            var result = true;
-            clearAllValidationError();
-            if ($('#fileUpload').val() === "") {
-                addValidationError($('#fileUpload'), "This field is required.");               
-                $('#fileUpload').focus();
-                return false;
+            function requiredFieldValidation() {
+                var result = true;
+                clearAllValidationError();
+                if ($('#fileUpload').val() === "") {
+                    addValidationError($('#fileUpload'), "Please upload file.");
+                    $('#fileUpload').focus();
+                    return false;
+                }
+                return result;
             }
-            return result;
-        }
-        $(document).ready(function () {
-            $("input[type='submit']").click(function (event) {
-                event.preventDefault();
-                if (requiredFieldValidation()) {
-                    var fileData = new FormData();
-                    var input = document.getElementById("fileUpload");
-                    fileData.append(input.files[0].name, input.files[0]);
-                    $.ajax({
-                        url: '/api/file',
-                        type: "POST",
-                        contentType: false,
-                        processData: false, // Not to process data
-                        data: fileData,
-                        success: function (data) {
-                            console.log(data);
-                            alert("OK");
-                        },
-                        error: function (xhr, status, error) {
-                            alert("Error");
-                            console.log(xhr);
-                            console.log(status);
-                            console.log(error);
-                        }
-                    });
-                }               
+            $(document).ready(function () {                
+                $("#btnSave").click(function (event) {
+                    event.preventDefault();
+                    if (requiredFieldValidation()) {
+                        displayBlockUI();
+                        var fileData = new FormData();
+                        var input = document.getElementById("fileUpload");
+                        fileData.append(input.files[0].name, input.files[0]);
+                        $.ajax({
+                            url: '/api/file',
+                            type: "POST",
+                            contentType: false,
+                            processData: false, // Not to process data
+                            data: fileData,
+                            success: function (data) {
+                                hideBlockUI();
+                                $('#myModal .modal-header .modal-title').html("Information!");
+                                $('#myModal .modal-body').html(data.replace(/"/g, ""));
+                                $("#myModal").modal('show');
+                                $('#fileUpload').val("");
+                            },
+                            error: function (xhr, status, error) {
+                                hideBlockUI();
+                                $('#myModal .modal-header .modal-title').html("Error!");
+                                $('#myModal .modal-body').html(xhr.responseText.replace(/"/g, ""));
+                                $("#myModal").modal('show');
+                            }
+                        });
+                    }
+                });
             });
-        });
-    </script>
-}
+        </script>
+    }
 

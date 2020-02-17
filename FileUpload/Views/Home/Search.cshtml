@@ -1,0 +1,161 @@
+﻿@model List<FileUpload.Models.TransactionListViewModel>
+<div class="form-horizontal">
+    <h3>Search Transactions</h3>
+    <div class="form-group row">
+        <div class="col-md-12">
+            <label class="control-label">Search By</label><br />
+            <div class="radio-inline">
+                <label style="font-weight: unset;">
+                    @Html.RadioButton("rdoSearch", "1", true) Currency
+                </label>
+            </div>
+            <div class="radio-inline">
+                <label style="font-weight: unset;">
+                    @Html.RadioButton("rdoSearch", "2", false) Date Range
+                </label>
+            </div>
+            <div class="radio-inline">
+                <label style="font-weight: unset;">
+                    @Html.RadioButton("rdoSearch", "3", false) Status
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row form-group div_DateRange" style="display:none;">
+        <div class="col-md-12">
+            <label class="control-label">From Date :</label><br />
+            <span class="lblContainer col-md-3 col-sm-3">
+                <span class="input-group datetimepicker-container">
+                    <input id="txtFrom" name="txtFrom" class="form-control datepicker-input" type="search" autocomplete="off" />
+                    <span id="calender-icon1" class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </span>
+            </span><br/><br /><span class="text-danger field-validation-valid" data-valmsg-for="txtFrom" data-valmsg-replace="true"></span>
+        </div>
+
+    </div>
+    <div class="row form-group div_DateRange" style="display:none;">
+        <div class="col-md-12">
+            <label class="control-label">To Date :</label> <br />
+            <span class="lblContainer col-md-3 col-sm-3">
+                <span class="input-group datetimepicker-container">
+                    <input id="txtTo" name="txtTo" class="form-control datepicker-input" type="search" autocomplete="off" />
+                    <span id="calender-icon2" class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </span>
+            </span><br /><br /><span class="text-danger field-validation-valid" data-valmsg-for="txtTo" data-valmsg-replace="true"></span>
+        </div>
+
+    </div>
+    <div class="row form-group div_DateRange" style="display:none;">
+        <div class="col-md-12">
+            <input type="button" id="btnSearch" value="Search" onclick="Search();" class="btn btn-success col-xs-12 col-sm-3 col-md-2 col-lg-2" />
+        </div>
+    </div>
+    <div class="form-group row" id="div_Search">
+        <div class="col-sm-3 col-md-3 pull-right">
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <input type="text" class="form-control" placeholder="Search" id="txtSearch">
+                    <button class="btn btn-default" type="button" onclick="Search();">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-hover" id="tblSearchResult">
+                <thead>
+                    <tr class="rowHeader"><th>Id</th><th>Payment</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.payment)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        function Search() {
+            $('#tblSearchResult > tbody').empty();
+            var row = "";
+            var url = "";
+            if ($(":radio[name=rdoSearch]:checked").val() == "1") {
+                url = "/api/file/GetByCurrency?value=" + $('#txtSearch').val().trim();
+            }
+            else if ($(":radio[name=rdoSearch]:checked").val() == "2") {
+                if (!isValidDateFormat($('#txtFrom')) || !isValidDateFormat($('#txtTo'))) {
+                    return;
+                }
+                else {
+                    url = "/api/file/GetByDate?from=" + $('#txtFrom').val().trim() + "&to=" + $('#txtTo').val().trim();
+                }
+            }
+            else {
+                url = "/api/file/GetByStatus?status=" + $('#txtSearch').val().trim();
+            }
+            displayBlockUI();
+            $.getJSON(url, function (data) {
+                $.each(data, function (key, val) {
+                    row += "<tr><td>" + val.id + "</td><td>" + val.payment + "</td><td>" + val.Status + "</td></tr>";
+                });
+                hideBlockUI();
+                if (row == "") {
+                    $('#myModal .modal-header .modal-title').html("Information!");
+                    $('#myModal .modal-body').html("Search not found.");
+                    $("#myModal").modal('show');
+                }
+                else
+                    $('#tblSearchResult > tbody').html(row);
+
+            })
+            .fail(function (xhr, textStatus, err) {
+                hideBlockUI();                
+                $('#myModal .modal-header .modal-title').html("Error!");
+                $('#myModal .modal-body').html(xhr.responseJSON.Message);
+                $("#myModal").modal('show');
+            });
+        }
+        $(document).ready(function () {
+            $('input[type=radio][name=rdoSearch]').change(function () {
+                if (this.value === "2") {
+                    $(".div_DateRange").show();
+                    $("#div_Search").hide();
+                    $("#txtSearch").val("");
+                }
+                else {
+                    $(".div_DateRange").hide();
+                    $('#txtFrom').val("");
+                    $('#txtTo').val("");
+                    $("#div_Search").show();
+                }
+            });
+            $("#txtSearch").keypress(function (e) {
+                if (e.which == 13) {
+                    Search();
+                    return false;
+                }
+            });
+        });
+    </script>
+}
+

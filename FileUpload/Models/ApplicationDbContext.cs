@@ -11,7 +11,7 @@ namespace FileUpload.Models
     {
         public ApplicationDbContext() : base("DefaultConnection")
         {
-            
+            Database.SetInitializer(new CreateDatabaseIfNotExists<ApplicationDbContext>());
         }
         public static ApplicationDbContext Create()
         {

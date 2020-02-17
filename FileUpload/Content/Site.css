@@ -15,3 +15,13 @@ select,
 textarea {
     max-width: 280px;
 }
+.datetimepicker-container {
+    display: inline-flex;
+}
+.input-group-addon, .input-group-btn {
+    width: 0%;
+    min-width: 40px;
+    min-height: 34px;
+}
+
+
