@@ -4,7 +4,7 @@ A service to upload transaction data from csv and xml files into database and qu
 
 ## Getting Started
 
-In order to run and test the project, you need to change database configuration. After that need to create necessary database table by run the script provided in this project.
+In order to run and test the project, you need to change database configuration. After that need to create necessary database table by running the script provide in this project.
 
 ### Change database configuration
 
